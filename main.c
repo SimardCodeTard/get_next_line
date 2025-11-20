@@ -6,7 +6,7 @@
 /*   By: smenard <smenard@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/13 15:46:29 by smenard           #+#    #+#             */
-/*   Updated: 2025/11/20 12:48:46 by smenard          ###   ########.fr       */
+/*   Updated: 2025/11/20 16:42:22 by smenard          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,8 +25,10 @@ int	main(void)
 	while (line)
 	{
 		printf("line : %s", line);
+		free(line);
 		line = get_next_line(fd);
 	}
+	printf("\n===");
 	close(fd);
 	return (EXIT_SUCCESS);
 }

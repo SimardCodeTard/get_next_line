@@ -6,7 +6,7 @@
 /*   By: smenard <smenard@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/19 11:29:37 by smenard           #+#    #+#             */
-/*   Updated: 2025/11/20 12:54:10 by smenard          ###   ########.fr       */
+/*   Updated: 2025/11/20 13:37:55 by smenard          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 # define GET_NEXT_LINE_H
 
 # ifndef BUFFER_SIZE
-#  define BUFFER_SIZE 256
+#  define BUFFER_SIZE 16
 # endif
 
 # ifndef MAX_FD
@@ -36,7 +36,7 @@ char	*get_rest(int fd);
 
 void	extract_rest(char *rest, char *buffer, size_t last_line_len);
 
-char	*ft_strndup(char *src, size_t n);
+char	*ft_strncpy(char *src, char *dest, size_t n);
 
 size_t	ft_strlen(char *str);
 

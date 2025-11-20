@@ -6,7 +6,7 @@
 /*   By: smenard <smenard@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/19 15:18:59 by smenard           #+#    #+#             */
-/*   Updated: 2025/11/20 12:54:00 by smenard          ###   ########.fr       */
+/*   Updated: 2025/11/20 13:37:32 by smenard          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,12 +29,15 @@ char	*get_next_line(int fd)
 	if (!rest)
 		return (NULL);
 	rest_len = ft_strlen(rest);
-	buffer = ft_strndup(rest, rest_len);
+	buffer = malloc((BUFFER_SIZE + 1) * sizeof(char));
+	ft_strncpy(rest, buffer, rest_len);
 	if (!buffer)
 		return (safe_free_return((void **) &buffer, 1, NULL));
 	line = extract_line(fd, buffer, rest_len);
 	last_line_len = ft_strlen(line);
 	extract_rest(rest, buffer, last_line_len);
+	// if (rest && !rest[0])
+	// 	free(rest);
 	return (safe_free_return((void **) &buffer, 1, line));
 }
 
@@ -63,24 +66,23 @@ void	extract_rest(char *rest, char *buffer, size_t last_line_len)
 	size_t	i;
 
 	i = 0;
-	while (i < BUFFER_SIZE)
+	while (i < BUFFER_SIZE - last_line_len)
 	{
 		rest[i] = buffer[i + last_line_len];
 		i++;
 	}
-	rest[i] = 0;
+	rest[i] = '\0';
 }
 
 /**
- * Allocates memory and copies n characters from src into a new string
- * Does not NULL-terminate the new string
+ * Copies n characters from src into the string dest and returns it
  */
-char	*ft_strndup(char *src, size_t n)
+char	*ft_strncpy(char *src, char *dest, size_t n)
 {
 	size_t	i;
-	char	*dest;
 
-	dest = malloc(n * sizeof(char));
+	if (!src)
+		return (dest);
 	if (!dest)
 		return (NULL);
 	i = 0;
@@ -89,6 +91,7 @@ char	*ft_strndup(char *src, size_t n)
 		dest[i] = src[i];
 		i++;
 	}
+	dest[i] = '\0';
 	return (dest);
 }
 
