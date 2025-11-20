@@ -6,11 +6,11 @@
 /*   By: smenard <smenard@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/19 11:29:37 by smenard           #+#    #+#             */
-/*   Updated: 2025/11/20 11:50:54 by smenard          ###   ########.fr       */
+/*   Updated: 2025/11/20 12:46:55 by smenard          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef	GET_NEXT_LINE_H
+#ifndef GET_NEXT_LINE_H
 # define GET_NEXT_LINE_H
 
 # ifndef BUFFER_SIZE
@@ -36,9 +36,9 @@ char	*get_rest(int fd);
 
 void	extract_rest(char *rest, char *buffer, size_t last_line_len);
 
-char	*ft_strndup(char *s, size_t n);
+char	*ft_strndup(char *src, size_t n);
 
-size_t	ft_strlen(char *str);
+size_t	ft_strlen(char *str, char stop);
 
 /* ===== get_next_line_utils.c ===== */
 

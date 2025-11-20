@@ -6,7 +6,7 @@
 /*   By: smenard <smenard@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/19 13:56:31 by smenard           #+#    #+#             */
-/*   Updated: 2025/11/20 11:37:03 by smenard          ###   ########.fr       */
+/*   Updated: 2025/11/20 12:47:51 by smenard          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,12 +35,12 @@ size_t	next_line_len(char *buffer, size_t size)
 char	*extract_line(int fd, char *buffer, size_t rest_len)
 {
 	ssize_t	i;
-	size_t	line_len;
+	ssize_t	line_len;
 	char	*full_line;
 	char	*current_line;
 
 	full_line = NULL;
-	while (read_exact(fd, buffer + rest_len, BUFFER_SIZE -  rest_len) > 0)
+	while (read_exact(fd, buffer + rest_len, BUFFER_SIZE - rest_len) > 0)
 	{
 		i = -1;
 		line_len = next_line_len(buffer, BUFFER_SIZE);
@@ -52,7 +52,7 @@ char	*extract_line(int fd, char *buffer, size_t rest_len)
 		current_line[i] = '\0';
 		full_line = ft_strjoin(full_line, current_line);
 		if (!full_line)
-			return (safe_free_return(&current_line, 1, NULL));
+			return (safe_free_return((void **) &current_line, 1, NULL));
 		if (buffer[i - 1] == '\n')
 			break ;
 		rest_len = 0;
@@ -72,7 +72,8 @@ size_t	read_exact(int fd, char *buffer, size_t size)
 	total_bytes_read = 0;
 	while (read_result > 0 && total_bytes_read < size)
 	{
-		read_result = read(fd, buffer + total_bytes_read, size - total_bytes_read);
+		read_result = read(fd, buffer + total_bytes_read,
+				size - total_bytes_read);
 		if (read_result > 0)
 			total_bytes_read += read_result;
 	}
@@ -85,7 +86,7 @@ size_t	read_exact(int fd, char *buffer, size_t size)
  */
 char	*ft_strjoin(char *s1, char *s2)
 {
-	const void *ptrs = {s1, s2};
+	const char	*ptrs[2] = {s1, s2};
 	size_t		i;
 	size_t		s1_len;
 	size_t		s2_len;
@@ -100,13 +101,13 @@ char	*ft_strjoin(char *s1, char *s2)
 		s2_len++;
 	s_joined = malloc((s1_len + s2_len + 1) * sizeof(char));
 	if (!s_joined)
-		return (safe_free_return(ptrs, 2, NULL));
+		return (safe_free_return ((void **) ptrs, 2, NULL));
 	while (s1 && s1[i])
 		s_joined[i] = s1[i];
 	while (s2 && s2[i])
 		s_joined[i - s1_len] = s2[i];
 	s_joined[s1_len + i] = '\0';
-	return (safe_free_return(ptrs, 2, s_joined));
+	return (safe_free_return((void **) ptrs, 2, s_joined));
 }
 
 /**
@@ -121,6 +122,7 @@ void	*safe_free_return(void **ptrs, size_t ptrs_size, void *value)
 	{
 		if (ptrs[i])
 			free(ptrs[i]);
+		i++;
 	}
 	return (value);
 }
