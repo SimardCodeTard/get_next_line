@@ -6,7 +6,7 @@
 /*   By: smenard <smenard@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/19 13:56:31 by smenard           #+#    #+#             */
-/*   Updated: 2025/11/19 14:07:40 by smenard          ###   ########.fr       */
+/*   Updated: 2025/11/20 11:37:03 by smenard          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,12 +16,12 @@
  * Counts the number of charcaters in the NULL terminated buffer until we reach
  * the end of a line or the end of the buffer
  */
-size_t	next_line_len(char *buffer)
+size_t	next_line_len(char *buffer, size_t size)
 {
 	size_t	i;
 
 	i = 0;
-	while (buffer[i] && buffer[i] == '\n')
+	while (i < size && buffer[i] == '\n')
 	{
 		i++;
 	}
@@ -32,27 +32,30 @@ size_t	next_line_len(char *buffer)
 /**
  * Extract the next line from the buffer and returns it
  */
-char	*extract_line(int fd, char *buffer)
+char	*extract_line(int fd, char *buffer, size_t rest_len)
 {
-	size_t	i;
+	ssize_t	i;
 	size_t	line_len;
 	char	*full_line;
 	char	*current_line;
-	bool	line_complete;
 
-	line_complete = false;
 	full_line = NULL;
-	while (!line_complete && read_exact(fd, buffer, BUFFER_SIZE) > 0)
+	while (read_exact(fd, buffer + rest_len, BUFFER_SIZE -  rest_len) > 0)
 	{
-		i = 0;
-		line_len = next_line_len(buffer);
-		while (i < line_len)
-		{
+		i = -1;
+		line_len = next_line_len(buffer, BUFFER_SIZE);
+		current_line = malloc((line_len + 1) * sizeof(char));
+		if (!current_line)
+			return (NULL);
+		while (++i < line_len)
 			current_line[i] = buffer[i];
-			i++;
-		}
 		current_line[i] = '\0';
 		full_line = ft_strjoin(full_line, current_line);
+		if (!full_line)
+			return (safe_free_return(&current_line, 1, NULL));
+		if (buffer[i - 1] == '\n')
+			break ;
+		rest_len = 0;
 	}
 	return (full_line);
 }
@@ -73,9 +76,7 @@ size_t	read_exact(int fd, char *buffer, size_t size)
 		if (read_result > 0)
 			total_bytes_read += read_result;
 	}
-	if (read_result == -1 || total_bytes_read < size)
-		return (-1);
-	return (total_bytes_read);
+	return (read_result);
 }
 
 /**
@@ -98,6 +99,8 @@ char	*ft_strjoin(char *s1, char *s2)
 	while (s2 && s2[s2_len])
 		s2_len++;
 	s_joined = malloc((s1_len + s2_len + 1) * sizeof(char));
+	if (!s_joined)
+		return (safe_free_return(ptrs, 2, NULL));
 	while (s1 && s1[i])
 		s_joined[i] = s1[i];
 	while (s2 && s2[i])

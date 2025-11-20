@@ -6,7 +6,7 @@
 /*   By: smenard <smenard@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/19 11:29:37 by smenard           #+#    #+#             */
-/*   Updated: 2025/11/19 15:20:25 by smenard          ###   ########.fr       */
+/*   Updated: 2025/11/20 11:50:54 by smenard          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,16 +34,22 @@ char	*get_next_line(int fd);
 
 char	*get_rest(int fd);
 
+void	extract_rest(char *rest, char *buffer, size_t last_line_len);
+
+char	*ft_strndup(char *s, size_t n);
+
+size_t	ft_strlen(char *str);
+
 /* ===== get_next_line_utils.c ===== */
 
-size_t	next_line_len(char *buffer);
+size_t	next_line_len(char *buffer, size_t size);
 
-char	*extract_line(int fd, char *buffer);
+char	*extract_line(int fd, char *buffer, size_t rest_len);
 
 size_t	read_exact(int fd, char *buffer, size_t size);
 
 char	*ft_strjoin(char *s1, char *s2);
 
-void	*free_return(void **ptrs, void *value);
+void	*safe_free_return(void **ptrs, size_t ptrs_len, void *value);
 
 #endif
