@@ -6,7 +6,7 @@
 /*   By: smenard <smenard@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/19 15:18:59 by smenard           #+#    #+#             */
-/*   Updated: 2025/11/20 12:47:10 by smenard          ###   ########.fr       */
+/*   Updated: 2025/11/20 12:54:00 by smenard          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,12 +28,12 @@ char	*get_next_line(int fd)
 	rest = get_rest(fd);
 	if (!rest)
 		return (NULL);
-	rest_len = ft_strlen(rest, -1);
+	rest_len = ft_strlen(rest);
 	buffer = ft_strndup(rest, rest_len);
 	if (!buffer)
 		return (safe_free_return((void **) &buffer, 1, NULL));
 	line = extract_line(fd, buffer, rest_len);
-	last_line_len = ft_strlen(line, 0);
+	last_line_len = ft_strlen(line);
 	extract_rest(rest, buffer, last_line_len);
 	return (safe_free_return((void **) &buffer, 1, line));
 }
@@ -50,7 +50,7 @@ char	*get_rest(int fd)
 		rests[fd] = malloc((BUFFER_SIZE + 1) * sizeof(char));
 		if (!rests[fd])
 			return (NULL);
-		rests[fd][0] = -1;
+		rests[fd][0] = '\0';
 	}
 	return (rests[fd]);
 }
@@ -68,7 +68,7 @@ void	extract_rest(char *rest, char *buffer, size_t last_line_len)
 		rest[i] = buffer[i + last_line_len];
 		i++;
 	}
-	rest[i] = -1;
+	rest[i] = 0;
 }
 
 /**
@@ -95,14 +95,14 @@ char	*ft_strndup(char *src, size_t n)
 /**
  * Counts the length of the given NULL-terminated string
  */
-size_t	ft_strlen(char *str, char stop)
+size_t	ft_strlen(char *str)
 {
 	size_t	len;
 
 	if (!str)
 		return (0);
 	len = 0;
-	while (str[len] != stop)
+	while (str[len])
 		len++;
 	return (len);
 }
