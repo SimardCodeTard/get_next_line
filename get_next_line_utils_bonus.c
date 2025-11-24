@@ -6,110 +6,116 @@
 /*   By: smenard <smenard@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/19 13:56:31 by smenard           #+#    #+#             */
-/*   Updated: 2025/11/22 10:32:41 by smenard          ###   ########.fr       */
+/*   Updated: 2025/11/25 15:01:04 by smenard          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "get_next_line.h"
+#include "get_next_line_bonus.h"
 
 /**
- * Counts the length of the given string until the first occurence of the
- * stop character or a NULL byte
+ * Allocates memory and concatenates the contents of every link in the list
+ * The input list is cleared afterwards
+ * If an error occurs, the list will not be cleared
  */
-size_t	ft_strlen(char *str, int8_t stop)
+char	*ft_lstjoin_clear(t_list *lst)
 {
-	size_t	len;
-
-	if (!str)
-		return (0);
-	len = 0;
-	while (str[len] && str[len] != stop)
-		len++;
-	if (str[len])
-		len++;
-	return (len);
-}
-
-/**
- * Extract the next line from the buffer and returns it
- */
-t_line_extract_result	extract_line(char *buffer, char *line)
-{
-	bool	line_complete;
+	t_list	*curr_link;
+	char	*s_joined;
 	size_t	i;
+	size_t	j;
 
-	line_complete = false;
 	i = 0;
-	while (buffer[i] && i < BUFFER_SIZE && !line_complete)
+	if (!lst)
+		return (NULL);
+	s_joined = malloc((*lst->total_content_length + 1) * sizeof(char));
+	if (!s_joined)
+		return (safe_free_return(lst, NULL, NULL, NULL));
+	curr_link = lst;
+	while (curr_link && curr_link->content_length > 0)
 	{
-		line[i] = buffer[i];
-		if (buffer[i] == '\n')
-			line_complete = true;
-		i++;
+		j = 0;
+		while (j < curr_link->content_length)
+			s_joined[i++] = curr_link->content[j++];
+		curr_link = curr_link->next;
 	}
-	line[i] = '\0';
-	if (line_complete)
-		return (COMPLETE);
 	if (i == 0)
-		return (NO_LINES);
-	return (BUFFER_END);
+		return (safe_free_return(lst, NULL, s_joined, NULL));
+	s_joined[i] = '\0';
+	return (safe_free_return(lst, NULL, NULL, s_joined));
 }
 
 /**
- * Reads up to size characets into buffer from fd
+ * Allocates memory and returns a new list
  */
-ssize_t	read_file(int fd, char *buffer, size_t size)
+t_list	*ft_lstnew(size_t *total_content_length)
+{
+	t_list	*lst;
+
+	lst = malloc(sizeof(t_list));
+	if (!lst)
+		return (NULL);
+	lst->next = NULL;
+	lst->content_length = 0;
+	lst->total_content_length = total_content_length;
+	return (lst);
+}
+
+/**
+ * Appends the given char to the end of the list
+ */
+t_list	*ft_lstappend(t_list *lst, char c)
+{
+	if (!lst)
+		return (NULL);
+	while (lst->next)
+		lst = lst->next;
+	if (lst->content_length >= LIST_MAX_CONTENT_LENGTH)
+	{
+		lst->next = ft_lstnew(lst->total_content_length);
+		lst = lst->next;
+		if (!lst)
+			return (NULL);
+	}
+	lst->content[lst->content_length] = c;
+	lst->content_length++;
+	(*lst->total_content_length)++;
+	return (lst);
+}
+
+ssize_t	read_file(int fd, t_buffer *buffer)
 {
 	ssize_t	read_result;
 
-	read_result = read(fd, buffer, size);
-	if (read_result >= 0)
-		buffer[read_result] = '\0';
+	read_result = read(fd, buffer->data, BUFFER_SIZE);
+	if (read_result == -1)
+		return (read_result);
+	buffer->data[read_result] = '\0';
+	buffer->buffer_length = read_result;
+	buffer->rest_index = 0;
 	return (read_result);
 }
 
 /**
- * Allocates memory and returns a string containing s1 and s2 joined together
- * The input strings are freed
+ * Frees all pointers and returns NULL
  */
-char	*ft_strjoin_free(char *s1, char *s2)
+void	*safe_free_return(t_list *lst, t_buffer **buffer, char *line,
+			void *value)
 {
-	const size_t	s1_len = ft_strlen(s1, '\0');
-	const size_t	s2_len = ft_strlen(s2, '\0');
-	ssize_t			i;
-	char			*s_joined;
+	t_list	*lst_next;
 
-	i = 0;
-	s_joined = malloc((s1_len + s2_len + 1) * sizeof(char));
-	if (!s_joined)
-		return (safe_free_return(s1, s2, NULL, NULL));
-	while (s1 && s1[i])
+	lst_next = lst;
+	while (lst_next)
 	{
-		s_joined[i] = s1[i];
-		i++;
+		lst_next = lst->next;
+		free(lst);
+		lst = lst_next;
 	}
-	while (s2 && s2[i - s1_len])
+	if (buffer)
 	{
-		s_joined[i] = s2[i - s1_len];
-		i++;
+		free((*buffer)->data);
+		free(*buffer);
+		*buffer = NULL;
 	}
-	s_joined[i] = '\0';
-	free(s1);
-	free(s2);
-	return (s_joined);
-}
-
-/**
- * Frees all pointers in ptrs and returns value
- */
-void	*safe_free_return(char *line, char *buffer, char **rest, void *value)
-{
 	free(line);
-	free(buffer);
-	if (rest)
-	{
-		free(*rest);
-		*rest = NULL;
-	}
 	return (value);
 }

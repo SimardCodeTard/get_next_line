@@ -6,7 +6,7 @@
 /*   By: smenard <smenard@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/19 11:29:37 by smenard           #+#    #+#             */
-/*   Updated: 2025/11/22 10:33:26 by smenard          ###   ########.fr       */
+/*   Updated: 2025/11/25 15:01:46 by smenard          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,10 @@
 #  define MAX_FD 1024
 # endif
 
+# ifndef LIST_MAX_CONTENT_LENGTH
+#  define LIST_MAX_CONTENT_LENGTH 4096
+# endif
+
 # include <unistd.h>
 # include <stdlib.h>
 # include <stdbool.h>
@@ -28,36 +32,52 @@
 # include <stdbool.h>
 # include <stdint.h>
 
-typedef enum e_extract_line_result
+typedef enum e_line_build_status
 {
+	ERROR,
 	INCOMPLETE,
 	COMPLETE,
 	BUFFER_END,
-	NO_LINES
-}						t_line_extract_result;
+	NO_LINES,
+}						t_line_build_status;
 
-/* ===== get_next_line_bonus.c ===== */
+typedef struct s_list
+{
+	struct s_list		*next;
+	char				content[LIST_MAX_CONTENT_LENGTH];
+	size_t				content_length;
+	size_t				*total_content_length;
+}						t_list;
+
+typedef struct s_buffer
+{
+	char				*data;
+	size_t				rest_index;
+	size_t				buffer_length;
+}						t_buffer;
+
+/* ===== get_next_line.c ===== */
 
 char					*get_next_line(int fd);
 
-char					**get_rest(int fd);
+char					*build_next_line(int fd, t_buffer **buf);
 
-void					extract_rest(char **rest, char *buffer,
-							size_t last_line_len);
+t_line_build_status		extract_line(int fd, t_list *lst, t_buffer **buf,
+							size_t *i);
 
-char					*ft_strcpy(char *src, char *dest);
+t_buffer				**get_buffer(int fd);
 
-/* ===== get_next_line_utils_bonus.c ===== */
+/* ===== get_next_line_utils.c ===== */
 
-size_t					ft_strlen(char *str, int8_t stop);
+char					*ft_lstjoin_clear(t_list *lst);
 
-t_line_extract_result	extract_line(char *buffer, char *line);
+t_list					*ft_lstnew(size_t *total_content_length);
 
-ssize_t					read_file(int fd, char *buffer, size_t size);
+t_list					*ft_lstappend(t_list *lst, char c);
 
-char					*ft_strjoin_free(char *s1, char *s2);
+ssize_t					read_file(int fd, t_buffer *buffer);
 
-void					*safe_free_return(char *line, char *buffer,
-							char **rest, void *value);
+void					*safe_free_return(t_list *lst, t_buffer **buffer,
+							char *line, void *value);
 
 #endif
