@@ -6,7 +6,7 @@
 /*   By: smenard <smenard@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/19 15:18:59 by smenard           #+#    #+#             */
-/*   Updated: 2025/11/22 10:32:50 by smenard          ###   ########.fr       */
+/*   Updated: 2025/11/24 12:21:11 by smenard          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,6 +32,8 @@ char	*build_next_line(int fd, char *buffer, size_t *last_part_len)
 		extract_line_res = extract_line(buffer, line_part);
 		*last_part_len = ft_strlen(line_part, '\0');
 		full_line = ft_strjoin_free(full_line, line_part);
+		if (!full_line)
+			return (NULL);
 		if (extract_line_res == BUFFER_END)
 		{
 			read_result = read_file(fd, buffer, BUFFER_SIZE);
