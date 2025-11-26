@@ -6,7 +6,7 @@
 /*   By: smenard <smenard@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/19 11:29:37 by smenard           #+#    #+#             */
-/*   Updated: 2025/11/26 09:39:17 by smenard          ###   ########.fr       */
+/*   Updated: 2025/11/26 09:48:41 by smenard          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,6 @@ typedef enum e_line_build_status
 	ERROR,
 	INCOMPLETE,
 	COMPLETE,
-	BUFFER_END,
 	NO_LINES,
 }						t_line_build_status;
 

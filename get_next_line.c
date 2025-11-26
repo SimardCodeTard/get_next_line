@@ -6,7 +6,7 @@
 /*   By: smenard <smenard@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/19 15:18:59 by smenard           #+#    #+#             */
-/*   Updated: 2025/11/26 09:27:19 by smenard          ###   ########.fr       */
+/*   Updated: 2025/11/26 09:49:41 by smenard          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@ char	*get_next_line(int fd)
 	t_buffer	**buffer;
 	char		*line;
 
-	if (MAX_FD > 1024)
+	if (fd < 0 && fd >= MAX_FD)
 		return (NULL);
 	buffer = get_buffer(fd);
 	if (!buffer || !*buffer)
@@ -98,8 +98,6 @@ t_buffer	**get_buffer(int fd)
 {
 	static t_buffer	*buffers[MAX_FD];
 
-	if (fd < 0)
-		return (NULL);
 	if (!buffers[fd])
 	{
 		buffers[fd] = malloc(sizeof(t_buffer));
