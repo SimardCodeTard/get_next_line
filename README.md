@@ -1,26 +1,86 @@
 # get_next_line
+
 ## Line-by-line file reader
-Reads the next line from a given file descriptor
-## Behaviour
-Get next line handles up to MAX_FD file descriptors, 1024 by default. You can redefine this macro using the flag -D during compilation I.E:
+A simple and efficient function to read one line at a time from a file descriptor.
 
-`-D MAX_FD=42`
+---
 
-You can also redefine the size of the buffer used to read from the file descriptor by overriding the macro BUFFER_SIZE I.E:
+## 🧩 Overview
 
-`-D BUFFER_SIZE=42`
+`get_next_line` reads the next line from a given file descriptor, returning a freshly allocated string **including the trailing newline** (except for the last line if no newline is present).
+Its purpose is to make file reading predictable, safe, and easy to use in loops.
 
-- GNL returns NULL when the end of the file is reached
-- GNL returns NULL when an error occurs (memory allocation fail, read fail)
-- GNL will return NULL when the file descriptor is invalid (-1) or is closed
-- GNL will return NULL when the given file descriptor is superior to MAX_FD
-### Undefined behaviour
-GNL exhibist undefined behaviour in the following cases :
-- When edits are made to the file associated with the given file descriptor between to calls to GNL  
-- A binary file is associated with the given file descriptor
+---
 
-# Usage
+## ⚙️ Behaviour
 
-You are free to use this code anywhere, to edit it or do anything you want with it
+`get_next_line` supports up to `MAX_FD` file descriptors simultaneously (1024 by default).
+You can redefine this macro at compile time, for example:
 
-A release will be uploaded *soon*™ with a header file and an archive
+```bash
+-D MAX_FD=42
+````
+
+You may also change the size of the internal read buffer by setting the `BUFFER_SIZE` macro:
+
+```bash
+-D BUFFER_SIZE=42
+```
+
+### 📌 Notes
+
+* `get_next_line` returns **NULL** at end-of-file
+* `get_next_line` returns **NULL** on read or allocation failure
+* `get_next_line` returns **NULL** if the file descriptor is invalid (`-1`) or closed
+* `get_next_line` returns **NULL** if the file descriptor is greater than `MAX_FD`
+
+---
+
+## ⚠️ Undefined behaviour
+
+`get_next_line` exhibits undefined behaviour in the following cases:
+
+* If the file associated with the given file descriptor is **modified between calls**
+* If the file descriptor refers to a **binary file**
+* If you pass invalid or corrupted file descriptors from external libraries
+
+These cases may result in memory corruption, infinite loops, unexpected return values, the release of Half Life 3, a complete collapse of the space time continuum, we don't know, it's undefined.
+
+---
+
+## 🧪 Example usage
+
+```c
+int     fd = open("file.txt", O_RDONLY);
+char    *line;
+
+while ((line = get_next_line(fd)) != NULL)
+{
+    printf("%s", line);
+    free(line);
+}
+close(fd);
+```
+
+---
+
+## 🛠️ Compilation
+
+To compile with custom macros:
+
+```bash
+gcc -Wall -Wextra -Werror -D BUFFER_SIZE=128 your_program.c get_next_line.c get_next_line_utils.c -o gnl_test
+```
+
+---
+
+## 📦 Usage & Licensing
+
+You are free to download, edit, reuse, and integrate this code into any project — educational or personal.
+
+A proper release will be uploaded *soon™*, including:
+
+* a precompiled archive (`get_next_line.a`)
+* a full header
+
+---
