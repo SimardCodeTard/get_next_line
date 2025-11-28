@@ -6,7 +6,7 @@
 /*   By: smenard <smenard@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/19 13:56:31 by smenard           #+#    #+#             */
-/*   Updated: 2025/11/25 14:59:29 by smenard          ###   ########.fr       */
+/*   Updated: 2025/11/28 16:06:46 by smenard          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,6 @@
 /**
  * Allocates memory and concatenates the contents of every link in the list
  * The input list is cleared afterwards
- * If an error occurs, the list will not be cleared
  */
 char	*ft_lstjoin_clear(t_list *lst)
 {
@@ -89,16 +88,16 @@ ssize_t	read_file(int fd, t_buffer *buffer)
 	read_result = read(fd, buffer->data, BUFFER_SIZE);
 	if (read_result == -1)
 		return (read_result);
-	buffer->data[read_result] = '\0';
-	buffer->buffer_length = read_result;
-	buffer->rest_index = 0;
+	if (read_result < BUFFER_SIZE)
+		buffer->data[read_result] = '\0';
+	buffer->index = 0;
 	return (read_result);
 }
 
 /**
- * Frees all pointers and returns NULL
+ * Frees all pointers, fills the buffer with NULL bytes and returns value
  */
-void	*safe_free_return(t_list *lst, t_buffer **buffer, char *line,
+void	*safe_free_return(t_list *lst, t_buffer *buffer, char *line,
 			void *value)
 {
 	t_list	*lst_next;
@@ -111,11 +110,7 @@ void	*safe_free_return(t_list *lst, t_buffer **buffer, char *line,
 		lst = lst_next;
 	}
 	if (buffer)
-	{
-		free((*buffer)->data);
-		free(*buffer);
-		*buffer = NULL;
-	}
+		free(buffer);
 	free(line);
 	return (value);
 }

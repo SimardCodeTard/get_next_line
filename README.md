@@ -5,6 +5,9 @@ A simple and efficient function to read one line at a time from a file descripto
 
 ---
 
+## Project status :
+This project is still in development, its structure (and perhaps behaviour) will change before the end
+
 ## 🧩 Overview
 
 `get_next_line` reads the next line from a given file descriptor, returning a freshly allocated string **including the trailing newline** (except for the last line if no newline is present).
@@ -84,3 +87,6 @@ A proper release will be uploaded *soon™*, including:
 * a full header
 
 ---
+
+## ➕ PS:
+To stress-test the function, you can find the holy bible in raw text at [this url](https://www.gutenberg.org/cache/epub/7999/pg7999.txt) | [(alt)](https://ebible.org/eng-web/links.htm?utm_source=chatgpt.com)
