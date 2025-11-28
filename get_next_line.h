@@ -6,7 +6,7 @@
 /*   By: smenard <smenard@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/19 11:29:37 by smenard           #+#    #+#             */
-/*   Updated: 2025/11/26 09:48:38 by smenard          ###   ########.fr       */
+/*   Updated: 2025/11/28 15:09:12 by smenard          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,20 +47,18 @@ typedef struct s_list
 typedef struct s_buffer
 {
 	char				*data;
-	size_t				rest_index;
-	size_t				buffer_length;
+	size_t				index;
 }						t_buffer;
 
 /* ===== get_next_line.c ===== */
 
 char					*get_next_line(int fd);
 
-char					*build_next_line(int fd, t_buffer **buf);
+char					*build_next_line(int fd, t_buffer *buffer);
 
-t_line_build_status		extract_line(int fd, t_list *lst, t_buffer **buf,
-							size_t *i);
+t_line_build_status		extract_line(int fd, t_list *lst, t_buffer *buffer);
 
-t_buffer				**get_buffer(int fd);
+t_buffer				*get_buffer(int fd);
 
 /* ===== get_next_line_utils.c ===== */
 
@@ -72,7 +70,7 @@ t_list					*ft_lstappend(t_list *lst, char c);
 
 ssize_t					read_file(int fd, t_buffer *buffer);
 
-void					*safe_free_return(t_list *lst, t_buffer **buffer,
+void					*safe_free_return(t_list *lst, t_buffer *buffer,
 							char *line, void *value);
 
 #endif

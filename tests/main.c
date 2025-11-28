@@ -6,7 +6,7 @@
 /*   By: smenard <smenard@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/13 15:46:29 by smenard           #+#    #+#             */
-/*   Updated: 2025/11/25 15:00:18 by smenard          ###   ########.fr       */
+/*   Updated: 2025/11/28 15:58:33 by smenard          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 #include <string.h>
 #include <ctype.h>
 #include <fcntl.h>
+#include <time.h>
 
 int	ft_isprint(int c)
 {
@@ -73,13 +74,36 @@ char	*read_and_print_line(int fd)
 	return (line);
 }
 
+void	test_read_all_lines(int fd, char *path)
+{
+	char	*line;
+	int		i;
+
+	printf("=====Reading all lines from file %s=====\n", path);
+	i = 0;
+	line = "";
+	while (line)
+	{
+		printf("Line [%2d]: ", i + 1);
+		line = read_and_print_line(fd);
+		free(line);
+		i++;
+	}
+	close(fd);
+	printf("==========\n");
+}
+
 void	test_read_file(char *path, int nlines)
 {
 	char	*line;
 	int		fd;
 
-	printf("=====Reading %2d lines from file %s=====\n", nlines, path);
 	fd = open(path, O_RDONLY);
+	if (fd == -1)
+		printf("WARNING: Failed to open file at %s\n", path);
+	if (nlines == -1)
+		return (test_read_all_lines(fd, path));
+	printf("=====Reading %2d lines from file %s=====\n", nlines, path);
 	line = "";
 	for (int i = 0; i < nlines; i++)
 	{
@@ -91,19 +115,82 @@ void	test_read_file(char *path, int nlines)
 	printf("==========\n");
 }
 
-int	main(void)
+void	test_read_file_all_lines_timer(char *path)
 {
+	int		fd;
+	char	*line;
+	clock_t	before;
+	int		diff;
+	int		duration;
+
+	fd = open(path, 0, 0);
+	if (fd == -1)
+		printf("WARNING: Failed to open file at %s\n", path);
+	printf("Reading all lines from file %s with timer\n", path);
+	before = clock();
+	while ((line = get_next_line(fd)))
+		free(line);
+	diff = clock() - before;
+	duration = diff * 1000 / CLOCKS_PER_SEC;
+	printf("Time taken: %d milliseconds\n",
+		duration);
+	close(fd);
+	printf("==========\n");
+}
+
+void	test_read_file_timer(char *path, int nlines)
+{
+	int		fd;
+	clock_t	before;
+	int		diff;
+	int		duration;
+
+	fd = open(path, 0, 0);
+	if (fd == -1)
+		printf("WARNING: Failed to open file at %s\n", path);
+	if (nlines == -1)
+		return (test_read_file_all_lines_timer(path));
+	printf("Reading %2d lines from file %s with timer\n", nlines, path);
+	before = clock();
+	for (int i = 0; i < nlines; i++)
+		free(get_next_line(fd));
+	diff = clock() - before;
+	duration = diff * 1000 / CLOCKS_PER_SEC;
+	printf("Time taken: %d milliseconds\n",
+		duration);
+	close(fd);
+	printf("==========\n");
+}
+
+int	main(int ac, char **av)
+{
+	char	*path;
+	int		nlines;
 	// Norminette flag me :3
-	test_read_file("(INVALID FD)", 1);
-	test_read_file("tests/1char.txt", 2);
-	test_read_file("tests/empty.txt", 1);
-	test_read_file("tests/giant_line_nl.txt", 3);
-	test_read_file("tests/giant_line.txt", 2);
-	test_read_file("tests/lines_around_10.txt", 6);
-	test_read_file("tests/multiple_nl.txt", 6);
-	test_read_file("tests/one_line_no_nl.txt", 2);
-	test_read_file("tests/only_nl.txt", 2);
-	test_read_file("tests/read_error.txt", 5);
-	test_read_file("tests/variable_nls.txt", 13);
+
+	if (ac == 1)
+		return (1);
+	if (ac == 2)
+	{
+		path = av[1];
+		nlines = -1;
+	}
+	else if (ac == 3)
+	{
+		path = av[1];
+		nlines = atoi(av[2]);
+	}
+	else
+	{
+		path = av[1];
+		nlines = atoi(av[2]);
+		if (atoi(av[ac - 1]) == 1)
+			test_read_file_timer(path, nlines);
+		else
+			printf("Use \"1\" as the last argument to run the test \
+with a timer.\n");
+		return (EXIT_SUCCESS);
+	}
+	test_read_file(path, nlines);
 	return (EXIT_SUCCESS);
 }
