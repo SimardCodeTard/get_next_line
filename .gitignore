@@ -4,4 +4,4 @@
 *.o
 *.d
 *.a
-*bible*
+tests/the_holy_bible.txt

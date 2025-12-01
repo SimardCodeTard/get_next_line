@@ -6,7 +6,7 @@
 /*   By: smenard <smenard@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/19 11:29:37 by smenard           #+#    #+#             */
-/*   Updated: 2025/11/28 16:04:05 by smenard          ###   ########.fr       */
+/*   Updated: 2025/12/01 13:31:26 by smenard          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 # define GET_NEXT_LINE_H
 
 # ifndef BUFFER_SIZE
-#  define BUFFER_SIZE 128
+#  define BUFFER_SIZE 256
 # endif
 
 # ifndef MAX_FD
@@ -22,11 +22,12 @@
 # endif
 
 # ifndef LIST_MAX_CONTENT_LENGTH
-#  define LIST_MAX_CONTENT_LENGTH BUFFER_SIZE
+#  define LIST_MAX_CONTENT_LENGTH 4096
 # endif
 
 # include <unistd.h>
 # include <stdlib.h>
+# include <stdint.h>
 
 typedef enum e_line_build_status
 {
@@ -57,6 +58,8 @@ char					*get_next_line(int fd);
 char					*build_next_line(int fd, t_buffer *buffer);
 
 t_line_build_status		extract_line(int fd, t_list *lst, t_buffer *buffer);
+
+size_t					find_buffer_start(t_buffer *buffer);
 
 t_buffer				*get_buffer(int fd);
 

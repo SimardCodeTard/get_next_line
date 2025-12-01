@@ -6,7 +6,7 @@
 /*   By: smenard <smenard@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/19 15:18:59 by smenard           #+#    #+#             */
-/*   Updated: 2025/11/28 15:12:55 by smenard          ###   ########.fr       */
+/*   Updated: 2025/11/29 12:24:13 by smenard          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -92,21 +92,52 @@ t_line_build_status	extract_line(int fd, t_list *lst, t_buffer *buffer)
 }
 
 /**
+ * Binary search to find the first non-NULL byte in the buffer
+ * Remainder: The read bytes are set to \0 when we append them to the list
+ * We need to set buffer->index to the position of the first non-NULL byte
+ */
+size_t	find_buffer_start(t_buffer *buffer)
+{
+	int32_t	incr;
+	int32_t	decr;
+
+	incr = 0;
+	decr = BUFFER_SIZE - 1;
+	if (BUFFER_SIZE == 0)
+		return (0);
+	while (incr > 0 && decr < BUFFER_SIZE)
+	{
+		if (buffer->data[incr] || buffer->data[decr])
+			break ;
+		decr *= 2;
+		incr /= 2;
+	}
+	while (incr < BUFFER_SIZE && decr >= 0)
+	{
+		if (buffer->data[incr] && (incr == 0 || !buffer->data[incr - 1]))
+			return (incr);
+		incr++;
+		if (buffer->data[decr] && (decr == 0 || !buffer->data[decr - 1]))
+			return (decr);
+		decr--;
+	}
+	return (0);
+}
+
+/**
  * Get the static buffer containing the rest of the last call to get_next_line
  */
 t_buffer	*get_buffer(int fd)
 {
-	static char	buffers[BUFFER_SIZE];
+	static char	static_buffer[BUFFER_SIZE];
 	t_buffer	*buffer;
 
 	buffer = malloc(sizeof(t_buffer));
 	if (!buffer)
 		return (NULL);
-	buffer->data = buffers;
-	buffer->index = 0;
-	while (buffer->index < BUFFER_SIZE && !buffer->data[buffer->index])
-		buffer->index++;
-	if (buffer->index == BUFFER_SIZE && read_file(fd, buffer) <= 0)
+	buffer->data = static_buffer;
+	buffer->index = find_buffer_start(buffer);
+	if (buffer->index == 0 && read_file(fd, buffer) <= 0)
 		return (safe_free_return(NULL, buffer, NULL, NULL));
 	return (buffer);
 }
